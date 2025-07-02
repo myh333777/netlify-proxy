@@ -19,11 +19,14 @@ const PROXY_CONFIG = {
   "/portkey": "https://api.portkey.ai",
   "/fireworks": "https://api.fireworks.ai",
   "/openrouter": "https://openrouter.ai/api",
+  "/newapi": "https://newapi.190904.xyz",
+  "/gbalance": "http://usa2.190904.xyz:8000",
+  "/vertex": "https://aiplatform.googleapis.com/v1/projects/1094537026349/locations/global/publishers",
   // 任意网址
-  "/hexo": "https://hexo-gally.vercel.app", 
-  "/hexo2": "https://hexo-987.pages.dev",
-  "/halo": "https://blog.gally.dpdns.org",
-  "/kuma": "https://kuma.gally.dpdns.org",
+  "/oi": "https://myh333777-web.hf.space", 
+  "/oi2": "https://oui.190904.xyz",
+  "/ut": "http://usa4.190904.xyz:3001",
+  "/qbin": "https://qbin.198990.xyz",
   "/hf": "https://huggingface.co",
   "/tv": "https://tv.gally.ddns-ip.net",
   "/news": "https://newsnow-ahm.pages.dev"
