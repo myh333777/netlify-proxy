@@ -20,7 +20,9 @@ const PROXY_CONFIG = {
   "/fireworks": "https://api.fireworks.ai",
   "/openrouter": "https://openrouter.ai/api",
   "/newapi": "https://newapi.190904.xyz",
-  "/gbalance": "http://usa2.190904.xyz:8000",
+  "/gbalance": "http://jp2.190904.xyz:8010",
+  "/gbalance2": "http://usa2.190904.xyz:8000",
+  "/gbalance3": "http://usa4.190904.xyz:8010",
   "/vertex": "https://aiplatform.googleapis.com/v1/projects/1094537026349/locations/global/publishers",
   // 任意网址
   "/oi": "https://myh333777-web.hf.space", 
