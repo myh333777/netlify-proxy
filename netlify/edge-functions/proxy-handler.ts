@@ -19,6 +19,8 @@ const PROXY_CONFIG = {
   "/portkey": "https://api.portkey.ai",
   "/fireworks": "https://api.fireworks.ai",
   "/openrouter": "https://openrouter.ai/api",
+  "/422wolf": "https://422wolf.198990.xyz",
+  "/qwen": "https://qwen.198990.xyz",
   "/newapi": "https://newapi.190904.xyz",
   "/gbalance": "http://jp2.190904.xyz:8010",
   "/gbalance2": "http://usa2.190904.xyz:8000",
