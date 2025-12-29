@@ -1,137 +1,17 @@
 # netlify.toml
-# Netlify Edge Functions 极限优化配置
+
 
 [build]
-  publish = "public"
+  # 假设你的静态内容在 public 目录，如果不是，请修改
+  # 如果没有构建步骤，可以注释掉 command
+  # command = "echo 'No build command'"
+  publish = "public" # 确保这个目录存在或与你的项目匹配
 
 # --- Edge Functions 配置 ---
 
-# API 代理优先级最高（精简版，纯 API 转发）
-# 处理所有 AI API 和自定义服务代理
-
-# 主要 AI API 路由 - 使用精简版代理
+# 使用一个通配符路径将所有请求发送到 proxy-handler 函数
+# 函数内部逻辑将决定是否进行代理
 [[edge_functions]]
-  function = "api-proxy"
-  path = "/openai/*"
+  function = "proxy-handler" # 对应 netlify/edge-functions/proxy-handler.ts
+  path = "/*"
 
-[[edge_functions]]
-  function = "api-proxy"
-  path = "/claude/*"
-
-[[edge_functions]]
-  function = "api-proxy"
-  path = "/gemini/*"
-
-[[edge_functions]]
-  function = "api-proxy"
-  path = "/groq/*"
-
-[[edge_functions]]
-  function = "api-proxy"
-  path = "/xai/*"
-
-[[edge_functions]]
-  function = "api-proxy"
-  path = "/cohere/*"
-
-[[edge_functions]]
-  function = "api-proxy"
-  path = "/huggingface/*"
-
-[[edge_functions]]
-  function = "api-proxy"
-  path = "/together/*"
-
-[[edge_functions]]
-  function = "api-proxy"
-  path = "/novita/*"
-
-[[edge_functions]]
-  function = "api-proxy"
-  path = "/portkey/*"
-
-[[edge_functions]]
-  function = "api-proxy"
-  path = "/fireworks/*"
-
-[[edge_functions]]
-  function = "api-proxy"
-  path = "/openrouter/*"
-
-[[edge_functions]]
-  function = "api-proxy"
-  path = "/discord/*"
-
-[[edge_functions]]
-  function = "api-proxy"
-  path = "/telegram/*"
-
-# 自定义服务 - 使用精简版代理
-[[edge_functions]]
-  function = "api-proxy"
-  path = "/422wolf/*"
-
-[[edge_functions]]
-  function = "api-proxy"
-  path = "/qwen/*"
-
-[[edge_functions]]
-  function = "api-proxy"
-  path = "/newapi/*"
-
-[[edge_functions]]
-  function = "api-proxy"
-  path = "/gbalance/*"
-
-[[edge_functions]]
-  function = "api-proxy"
-  path = "/gbalance2/*"
-
-[[edge_functions]]
-  function = "api-proxy"
-  path = "/gbalance3/*"
-
-[[edge_functions]]
-  function = "api-proxy"
-  path = "/gcli/*"
-
-[[edge_functions]]
-  function = "api-proxy"
-  path = "/cliproxy/*"
-
-[[edge_functions]]
-  function = "api-proxy"
-  path = "/vertex/*"
-
-# 其他路由（网页代理，需要内容重写）- 使用原版代理
-[[edge_functions]]
-  function = "proxy-handler"
-  path = "/oi/*"
-
-[[edge_functions]]
-  function = "proxy-handler"
-  path = "/oi2/*"
-
-[[edge_functions]]
-  function = "proxy-handler"
-  path = "/ut/*"
-
-[[edge_functions]]
-  function = "proxy-handler"
-  path = "/qbin/*"
-
-[[edge_functions]]
-  function = "proxy-handler"
-  path = "/hf/*"
-
-[[edge_functions]]
-  function = "proxy-handler"
-  path = "/tv/*"
-
-[[edge_functions]]
-  function = "proxy-handler"
-  path = "/news/*"
-
-[[edge_functions]]
-  function = "proxy-handler"
-  path = "/proxy/*"
