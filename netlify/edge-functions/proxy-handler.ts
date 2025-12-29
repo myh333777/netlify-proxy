@@ -33,7 +33,9 @@ const PROXY_CONFIG = {
   "/qbin": "https://qbin.198990.xyz",
   "/hf": "https://huggingface.co",
   "/tv": "https://tv.gally.ddns-ip.net",
-  "/news": "https://newsnow-ahm.pages.dev"
+  "/news": "https://newsnow-ahm.pages.dev",
+  "/gcli": "http://usa4.190904.xyz:7856",
+  "/cliproxy": "http://usa4.190904.xyz:8317"
 };
 
 // 需要修复路径的内容类型
