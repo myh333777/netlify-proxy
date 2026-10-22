@@ -144,6 +144,22 @@ const SPECIAL_REPLACEMENTS: Record<string, Array<{ pattern: RegExp, replacement:
 };
 
 export default async (request: Request, context: Context) => {
+  // Route secrets must never appear in source control or the public homepage.
+  const url = new URL(request.url);
+  const path = url.pathname;
+  const token = Netlify.env.get("PROXY_ROUTE_TOKEN");
+  const namespace = token ? `/myh333777/${token}` : "";
+  if (!token || !path.startsWith(namespace + "/")) {
+    return new Response("Not Found", {
+      status: 404,
+      headers: { "Cache-Control": "no-store", "X-Robots-Tag": "noindex, nofollow", "Referrer-Policy": "no-referrer" }
+    });
+  }
+  // Cooperating crawlers are denied even if a link to the private route leaks.
+  if (/ClaudeBot|GPTBot|Googlebot|bingbot|Bytespider|CCBot|PetalBot|AhrefsBot|SemrushBot/i.test(request.headers.get("User-Agent") || "")) {
+    return new Response("Forbidden", { status: 403, headers: { "Cache-Control": "no-store" } });
+  }
+  const internalPath = path.slice(namespace.length);
   // 处理 CORS 预检请求 (OPTIONS)
   if (request.method === "OPTIONS") {
     return new Response(null, {
@@ -158,14 +174,11 @@ export default async (request: Request, context: Context) => {
     });
   }
 
-  const url = new URL(request.url);
-  const path = url.pathname;
-
   // 特殊处理 /proxy/ 路径 - 用于代理任意URL
-  if (path.startsWith('/proxy/')) {
+  if (internalPath.startsWith('/proxy/')) {
     try {
       // 从路径中提取目标URL
-      let targetUrlString = path.substring('/proxy/'.length);
+      let targetUrlString = internalPath.substring('/proxy/'.length);
 
       // 解码URL（如果已编码）
       if (targetUrlString.startsWith('http%3A%2F%2F') || targetUrlString.startsWith('https%3A%2F%2F')) {
@@ -211,7 +224,7 @@ export default async (request: Request, context: Context) => {
       if (referer) {
         try {
           const refUrl = new URL(referer);
-          const newReferer = `${targetUrl.protocol}//${targetUrl.host}${refUrl.pathname}${refUrl.search}`;
+          const newReferer = `${targetUrl.origin}/`;
           proxyRequest.headers.set('referer', newReferer);
         } catch (e) {
           // 如果解析 referer 出错，保持原样
@@ -233,6 +246,8 @@ export default async (request: Request, context: Context) => {
 
       // 添加 CORS 头
       newResponse.headers.set('Access-Control-Allow-Origin', '*');
+      newResponse.headers.set('Referrer-Policy', 'no-referrer');
+      newResponse.headers.set('X-Robots-Tag', 'noindex, nofollow');
       newResponse.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
       newResponse.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin, Range');
 
@@ -248,7 +263,7 @@ export default async (request: Request, context: Context) => {
         const redirectedUrl = new URL(location, targetUrl);
 
         // 将重定向URL也通过代理
-        const newLocation = `${url.origin}/proxy/${encodeURIComponent(redirectedUrl.toString())}`;
+        const newLocation = `${url.origin}${namespace}/proxy/${encodeURIComponent(redirectedUrl.toString())}`;
         newResponse.headers.set('Location', newLocation);
       }
 
@@ -274,9 +289,9 @@ export default async (request: Request, context: Context) => {
 
   for (const prefix of prefixes) {
     // 确保匹配的是完整的前缀部分，避免 /apixyz 匹配 /api
-    if (path === prefix || path.startsWith(prefix + '/')) {
+    if (internalPath === prefix || internalPath.startsWith(prefix + '/')) {
       targetBaseUrl = PROXY_CONFIG[prefix as keyof typeof PROXY_CONFIG];
-      matchedPrefix = prefix;
+      matchedPrefix = namespace + prefix;
       break; // 找到第一个（最具体的）匹配就停止
     }
   }
@@ -289,7 +304,7 @@ export default async (request: Request, context: Context) => {
     let targetUrlString = targetBaseUrl.replace(/\/$/, '') + remainingPath;
 
     // 特殊处理 Vertex AI 路径：自动替换 publisher 版本
-    if (matchedPrefix === '/vertex') {
+    if (matchedPrefix === namespace + '/vertex') {
       if (targetUrlString.includes('/publishers/v1beta')) {
         const originalUrl = targetUrlString;
         targetUrlString = targetUrlString.replace('/publishers/v1beta', '/publishers/google');
@@ -306,7 +321,7 @@ export default async (request: Request, context: Context) => {
     // 继承原始请求的查询参数
     targetUrl.search = url.search;
 
-    context.log(`Proxying "${path}" to "${targetUrl.toString()}"`);
+    context.log(`Proxying configured path to "${targetUrl.origin}"`);
 
     try {
       // 重要：创建一个新的 Request 对象以避免潜在问题
@@ -334,7 +349,7 @@ export default async (request: Request, context: Context) => {
       if (referer) {
         try {
           const refUrl = new URL(referer);
-          const newReferer = `${targetUrl.protocol}//${targetUrl.host}${refUrl.pathname}${refUrl.search}`;
+          const newReferer = `${targetUrl.origin}/`;
           proxyRequest.headers.set('referer', newReferer);
         } catch (e) {
           // 如果解析 referer 出错，保持原样
@@ -673,6 +688,8 @@ export default async (request: Request, context: Context) => {
 
       // 添加 CORS 头
       newResponse.headers.set('Access-Control-Allow-Origin', '*');
+      newResponse.headers.set('Referrer-Policy', 'no-referrer');
+      newResponse.headers.set('X-Robots-Tag', 'noindex, nofollow');
       newResponse.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
       newResponse.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin, Range');
 
